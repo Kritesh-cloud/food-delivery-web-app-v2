@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from "react";
-
 import { setHome, getHome } from "../../context/HomeContext";
-import { showDangerMessage } from "../../utils/notification";
+import { Close } from "@mui/icons-material";
 
 const UpdateRestauarnt = () => {
-  const { createRestaurant, getRestaurntDetail, getOwnerRestauarnt,updateRestaurantData } =
-    setHome();
+  const { getOwnerRestauarnt, updateRestaurantData } = setHome();
   const { ownerRestaurant } = getHome();
   const [isUpdateMode, setIsUpdateMode] = useState(true);
-  const [formData, setFormData] = useState({});
+  const [iconUpdated, setIconUpdated] = useState(false);
+  const [backgroundUpdated, setBackgroundUpdated] = useState(false);
+  const [galleryUpdated, setGalleryUpdated] = useState(false);
+  const [galleryRemove, setGalleryRemove] = useState([]);
+  const [galleryImages, setGaleryImages] = useState([]);
+  const [galleryImageLimit, setGalleryImageLimit] = useState(4);
   const [restaurantData, setRestaurantData] = useState({
     name: "hello hellow",
     description: "cat cta",
@@ -32,9 +35,20 @@ const UpdateRestauarnt = () => {
     const files = Array.from(e.target.files);
 
     if (name === "gallery") {
-      const newGallery = [...restaurantData.gallery, ...files].slice(0, 6);
+      const newGallery =
+        restaurantData.gallery == undefined
+          ? [...files]
+          : [...restaurantData.gallery, ...files].slice(0, galleryImageLimit);
       setRestaurantData({ ...restaurantData, gallery: newGallery });
+
+      setGalleryUpdated(true);
     } else {
+      if (name === "icon") {
+        setIconUpdated(true);
+      }
+      if (name === "background") {
+        setBackgroundUpdated(true);
+      }
       setRestaurantData({ ...restaurantData, [name]: files[0] });
     }
   };
@@ -43,7 +57,6 @@ const UpdateRestauarnt = () => {
     e.preventDefault();
     // console.log("Submitted Data:", restaurantData);
     const formDataCopy = { ...restaurantData };
-    console.log("formDataCopy,", formDataCopy);
 
     delete formDataCopy.approved;
     delete formDataCopy.backgroundUrl;
@@ -54,17 +67,58 @@ const UpdateRestauarnt = () => {
     delete formDataCopy.owner;
     delete formDataCopy.updatedAt;
 
+    const updatedFormDataCopy = {
+      ...formDataCopy,
+      iconChanged: iconUpdated,
+      backgroundChanged: backgroundUpdated,
+      newGalleryImageAdded: galleryUpdated,
+      removeGalleryImageIds: galleryRemove,
+    };
+
     const newFormData = new FormData();
-    const jsonBlob = new Blob([JSON.stringify(formDataCopy)], {
+    const jsonBlob = new Blob([JSON.stringify(updatedFormDataCopy)], {
       type: "application/json",
     });
-    newFormData.append("restaurantInfo", jsonBlob); // No need to specify "data.json" unless you're attaching a file
-    newFormData.append("iconChanged", false);
-    newFormData.append("backgroundChanged", false);
-    newFormData.append("newGalleryImageAdded", false);
-    newFormData.append("removeGalleryImageIds", JSON.stringify([])); // Stringify the array
-    
+    newFormData.append("restaurantInfo", jsonBlob);
+
+    try {
+      if (iconUpdated) {
+        newFormData.append("icon", restaurantData.icon, "icon.png");
+      }
+      if (backgroundUpdated) {
+        newFormData.append(
+          "background",
+          restaurantData.background,
+          "backgorund.png"
+        );
+      }
+
+      if (
+        restaurantData.gallery &&
+        galleryUpdated &&
+        Array.isArray(restaurantData.gallery)
+      ) {
+        restaurantData.gallery.forEach((file) => {
+          newFormData.append("gallery", file);
+        });
+      }
+    } catch (err) {
+      console.log("err in img ", err);
+    }
+    // for (let [key, value] of newFormData.entries()) {
+    //   console.log(key, value);
+    // }
+    setGaleryImages([]);
     updateRestaurantData(newFormData);
+  };
+
+  const removeGallery = (bgImageId) => {
+    setGalleryRemove([...galleryRemove, bgImageId]);
+    setGalleryUpdated(true);
+    setGaleryImages(
+      galleryImages &&
+        galleryImages.filter((bgImg) => !bgImageId.includes(bgImg)).sort()
+    );
   };
 
   useEffect(() => {
@@ -72,9 +126,16 @@ const UpdateRestauarnt = () => {
   }, []);
 
   useEffect(() => {
-    // console.log("ownerRestaurant", ownerRestaurant);
     setRestaurantData(ownerRestaurant);
+    setGaleryImages(
+      ownerRestaurant.imageGalleryList &&
+        ownerRestaurant.imageGalleryList.sort()
+    );
   }, [ownerRestaurant]);
+
+  useEffect(() => {}, [restaurantData]);
+
+  useEffect(() => {}, [galleryRemove]);
 
   return (
     <div className="bor w-full h-full overflow-y-auto">
@@ -196,7 +257,7 @@ const UpdateRestauarnt = () => {
           </div>
 
           {/* Image Uploads with Preview */}
-          <div className="mb-4 none">
+          <div className="mb-4 non">
             <label className="block text-black font-semibold mb-2">
               Icon Image
             </label>
@@ -207,6 +268,13 @@ const UpdateRestauarnt = () => {
               onChange={handleFileChange}
               className="w-full"
             />
+            {!iconUpdated && restaurantData.iconUrl && (
+              <img
+                src={restaurantData.iconUrl}
+                alt="Icon Preview"
+                className="w-20 h-20 mt-2 rounded-lg"
+              />
+            )}
             {restaurantData.icon && (
               <img
                 src={URL.createObjectURL(restaurantData.icon)}
@@ -216,7 +284,7 @@ const UpdateRestauarnt = () => {
             )}
           </div>
 
-          <div className="mb-4 none">
+          <div className="mb-4 non">
             <label className="block text-black font-semibold mb-2">
               Background Image
             </label>
@@ -227,18 +295,25 @@ const UpdateRestauarnt = () => {
               onChange={handleFileChange}
               className="w-full"
             />
+            {!backgroundUpdated && restaurantData.backgroundUrl && (
+              <img
+                src={restaurantData.backgroundUrl}
+                alt="Background Preview"
+                className="w-[500px] h-40 mt-2 rounded-lg object-cover"
+              />
+            )}
             {restaurantData.background && (
               <img
                 src={URL.createObjectURL(restaurantData.background)}
                 alt="Background Preview"
-                className="w-full h-40 mt-2 rounded-lg object-cover"
+                className="w-[500px] h-40 mt-2 rounded-lg object-cover"
               />
             )}
           </div>
 
-          <div className="mb-4 none">
+          <div className="mb-4 ">
             <label className="block text-black font-semibold mb-2">
-              Gallery Images (Up to 6)
+              Gallery Images (Up to 4)
             </label>
             <input
               type="file"
@@ -248,15 +323,39 @@ const UpdateRestauarnt = () => {
               onChange={handleFileChange}
               className="w-full"
             />
-            <div className="flex flex-wrap mt-2 gap-2">
-              {/* {restaurantData.gallery.map((image, index) => (
-                <img
-                  key={index}
-                  src={URL.createObjectURL(image)}
-                  alt={`Gallery ${index}`}
-                  className="w-20 h-20 rounded-lg"
-                />
-              ))} */}
+            <div className="flex flex-wrap mt-2 gap-3 bor">
+              {galleryImages &&
+                galleryImages.map((bgImage, index) => (
+                  <div
+                    key={bgImage}
+                    className="w-24 h-24 relative overflow bor"
+                  >
+                    <div
+                      className="flexmid p-[2px] absolute bor -right-2 -top-1 bg-stone-300 border border-stone-600 rounded-full cursor-pointer none"
+                      onClick={() => {
+                        removeGallery(bgImage);
+                      }}
+                    >
+                      <Close fontSize="small" />
+                    </div>
+                    <img
+                      key={index}
+                      src={`http://localhost:8080/image/${bgImage}`}
+                      alt={`Gallery ${index}`}
+                      className="w-24 h-24 rounded-lg"
+                    />
+                  </div>
+                ))}
+
+              {restaurantData.gallery &&
+                restaurantData.gallery.map((image, index) => (
+                  <img
+                    key={index}
+                    src={URL.createObjectURL(image)}
+                    alt={`Gallery ${index}`}
+                    className="w-24 h-24 rounded-lg"
+                  />
+                ))}
             </div>
           </div>
 

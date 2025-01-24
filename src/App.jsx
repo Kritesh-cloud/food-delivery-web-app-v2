@@ -28,6 +28,7 @@ import ListRestaurant from "./pages/dashboard/ListRestaurant";
 import ManageBrowseContent from "./pages/dashboard/ManageBrowseContent";
 import UpdateRestaurant from "./pages/dashboard/UpdateRestaurant";
 import ListMenu from "./pages/dashboard/ListMenu";
+import ViewRestauarnt from "./pages/dashboard/ViewRestauarnt";
 const App = () => {
   return (
     <>
@@ -51,8 +52,9 @@ const App = () => {
                     element={<ManageBrowseContent />}
                   />
                   <Route path="restaurant/update" element={<UpdateRestaurant />} />
+                  <Route path="restaurant/view" element={<ViewRestauarnt />} />
                   <Route path="menu" element={<ListMenu />} />
-                  {/* <Route path="browse-content/list" element={<UpdateRestaurant />} />
+                  {/* <Route path="browse-content/list" element={<RestauarntView />} />
                 <Route
                   path="browse-content/:id"
                   element={<UpdateBrowseContent />}

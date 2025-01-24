@@ -1,11 +1,12 @@
 import HomeIcon from "@mui/icons-material/Home";
-import FastfoodIcon from '@mui/icons-material/Fastfood';
-import ViewListIcon from '@mui/icons-material/ViewList';
-import SegmentIcon from '@mui/icons-material/Segment';
-import AssignmentIndIcon from '@mui/icons-material/AssignmentInd';
-import TableRestaurantIcon from '@mui/icons-material/TableRestaurant';
-import MenuBookIcon from '@mui/icons-material/MenuBook';
-import NotInterestedIcon from '@mui/icons-material/NotInterested';
+import FastfoodIcon from "@mui/icons-material/Fastfood";
+import ViewListIcon from "@mui/icons-material/ViewList";
+import SegmentIcon from "@mui/icons-material/Segment";
+import AssignmentIndIcon from "@mui/icons-material/AssignmentInd";
+import TableRestaurantIcon from "@mui/icons-material/TableRestaurant";
+import StorefrontIcon from "@mui/icons-material/Storefront";
+import MenuBookIcon from "@mui/icons-material/MenuBook";
+import NotInterestedIcon from "@mui/icons-material/NotInterested";
 
 export const dashboardAuthority = [
   "owner",
@@ -129,23 +130,23 @@ export const sideBarData = [
   },
   {
     for: ["owner"],
+    title: "View Restaurant",
+    link: "restaurant/view",
+    mainItem: true,
+    open: false,
+    selected: false,
+    display: true,
+    icon: <StorefrontIcon />,
+    subList: [],
+  },
+  {
+    for: ["owner"],
     title: "Update Restaurant",
     link: "restaurant/update",
     mainItem: true,
     open: false,
     selected: false,
     display: true,
-    icon: <TableRestaurantIcon />,
-    subList: [],
-  },
-  {
-    for: ["owner"],
-    title: "View Restaurant",
-    link: "restaurant/view",
-    mainItem: true,
-    open: false,
-    selected: false,
-    display: false,
     icon: <TableRestaurantIcon />,
     subList: [],
   },

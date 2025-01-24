@@ -64,7 +64,7 @@ const Sidebar = ({ userRoles = [] }) => {
                       to={item.subList.length > 0 ? "/dashboard" : item.link}
                       className={`flex  ${
                         isOpen ? "pl-4 pr-2" : "px-0"
-                      } py-2 text-white font-normal  hover:bg-orange-600 transition bor`}
+                      } py-2 text-white font-normal transition bor`}
                     >
                       <div className="relative flexmid bor h-8 w-8 bor">
                         <div className="absolute flexmid bor ">{item.icon}</div>

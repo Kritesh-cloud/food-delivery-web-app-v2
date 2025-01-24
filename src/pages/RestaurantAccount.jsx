@@ -30,7 +30,7 @@ const RestaurantAccount = () => {
     const files = Array.from(e.target.files);
 
     if (name === "gallery") {
-      const newGallery = [...formData.gallery, ...files].slice(0, 6);
+      const newGallery = [...formData.gallery, ...files].slice(0, 4);
       setFormData({ ...formData, gallery: newGallery });
     } else {
       setFormData({ ...formData, [name]: files[0] });
@@ -237,7 +237,7 @@ const RestaurantAccount = () => {
 
           <div className="mb-4">
             <label className="block text-black font-semibold mb-2">
-              Gallery Images (Up to 6)
+              Gallery Images (Up to 4)
             </label>
             <input
               type="file"

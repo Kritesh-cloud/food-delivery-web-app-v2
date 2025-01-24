@@ -1,37 +1,25 @@
-import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
-import Footer from "../../general/Footer";
+import React, { useState, useEffect } from "react";
+import { setHome, getHome } from "../../context/HomeContext";
 
-import { getHome, setHome } from "../../context/HomeContext";
-import Navbar from "../../general/Navbar";
-
-const RestaurantDetail = () => {
-  const { id } = useParams();
-  const [token, setToken] = useState(localStorage.getItem("authToken") || null);
+const ViewRestauarnt = () => {
+  const { getOwnerRestauarnt, updateRestaurantData } = setHome();
+  const { ownerRestaurant } = getHome();
   const [restaurant, setRestaurant] = useState({});
-  const { restaurantDetail } = getHome();
-  const { getRestaurntDetail, addToCart } = setHome();
 
   useEffect(() => {
-    getRestaurntDetail(id);
+    getOwnerRestauarnt();
   }, []);
 
   useEffect(() => {
-    setRestaurant(restaurantDetail);
-  }, [restaurantDetail]);
-
+    // console.log("ownerRestaurant", ownerRestaurant);
+    setRestaurant(ownerRestaurant);
+  }, [ownerRestaurant]);
   return (
-    <div
-      className={` min-h-screen  transition-colors duration-300 bg-white text-black bor`}
-    >
-      <div className="h-[80px]">
-        <Navbar />
-      </div>
-
+    <div className={`w-full h-full overflow-y-auto bor `}>
       {/* Header Section */}
 
       <div
-        className={`relative w-full h-72 bg-cover bg-center bor`}
+        className={`relative w-full h-72 bg-cover bg-center bor non`}
         style={{ backgroundImage: `url(${restaurant.backgroundUrl})` }}
       >
         <div
@@ -54,7 +42,7 @@ const RestaurantDetail = () => {
 
       {/* Contact & Timing Section */}
       <div
-        className={`mt-5 flex flex-col justify-between gap-2 p-5 rounded-lg md:mx-36 bg-gray-800 non`}
+        className={`mt-5 flex flex-col justify-between gap-2 p-5 rounded-lg md:mx-20 bg-gray-800 non`}
       >
         <p className="text-orange-500">Contact: {restaurant.contactNumber}</p>
         <p className="text-orange-500">Email: {restaurant.email}</p>
@@ -64,7 +52,7 @@ const RestaurantDetail = () => {
       </div>
 
       {/* Image Gallery */}
-      <div className="mt-5 grid grid-cols-2 md:grid-cols-4 gap-4 mx-4 md:mx-36">
+      <div className="mt-5 grid grid-cols-2 md:grid-cols-4 gap-4 mx-4 md:mx-20">
         {restaurant.imageGalleryList &&
           restaurant.imageGalleryList.map((imgId) => (
             <img
@@ -77,7 +65,7 @@ const RestaurantDetail = () => {
       </div>
 
       {/* Menu Section */}
-      <div className="mt-10 mx-4 md:mx-36 pb-[200px]">
+      <div className="mt-10 mx-4 md:mx-20 pb-[200px] ">
         <h2 className="text-2xl font-bold text-orange-500">Menu</h2>
 
         {restaurant.menuCategoryResponses &&
@@ -91,13 +79,13 @@ const RestaurantDetail = () => {
                   category.menuItemResponseList.map((item) => (
                     <div
                       key={item.id}
-                      className={`flex justify-between p-4 rounded-lg border-l-4 border-orange-500 transition-all cursor-pointer bg-gray-300 bor`}
+                      className={`flex justify-between p-4 rounded-lg border-l-4 border-orange-500 transition-all cursor-pointer  bor bg-gray-300`}
                     >
                       <div className="flexcol bor">
                         <h4 className="text-base ">{item.name}</h4>
                         <p className="">Price: NRS {item.price}</p>
                       </div>
-                      <div className="flexmid bor">
+                      <div className="flexmid bor none">
                         <span
                           className="flexmid text-white bg-orange-500 border transition-all border-[#c2410c] hover:bg-orange-700 text-sm py-[4px] px-4 rounded cursor-pointer"
                           onClick={() => addToCart(item.id, token)}
@@ -111,12 +99,8 @@ const RestaurantDetail = () => {
             </div>
           ))}
       </div>
-
-      <div>
-        <Footer />
-      </div>
     </div>
   );
 };
 
-export default RestaurantDetail;
+export default ViewRestauarnt;
